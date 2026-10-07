@@ -1,0 +1,4 @@
+actual,safe,prompt_injection,jailbreak
+safe,43,0,2
+prompt_injection,0,15,0
+jailbreak,0,1,44
