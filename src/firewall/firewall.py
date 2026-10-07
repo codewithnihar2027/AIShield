@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 from src.firewall.contracts import DetectorResult
 from src.firewall.policy import PolicyEngine
@@ -12,6 +13,7 @@ class FirewallResult:
     risk_score: float
     risk_level: str
     action: str
+    downstream_result: Any = None
 
 
 class Firewall:
@@ -34,4 +36,21 @@ class Firewall:
             risk_score=risk_result.risk_score,
             risk_level=risk_result.risk_level,
             action=policy_decision.action,
+        )
+
+    def process(self, detector_result: DetectorResult, downstream) -> FirewallResult:
+        result = self.inspect(detector_result)
+
+        if result.action != "ALLOW":
+            return result
+
+        downstream_result = downstream()
+
+        return FirewallResult(
+            label=result.label,
+            confidence=result.confidence,
+            risk_score=result.risk_score,
+            risk_level=result.risk_level,
+            action=result.action,
+            downstream_result=downstream_result,
         )
